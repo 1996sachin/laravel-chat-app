@@ -2,7 +2,7 @@
 This is a Laravel-based chat application.
 
 ## Screenshots
-![alt text](https://i.ibb.co/wRcfLwP/Screenshot-2022-09-20-02![alt text](https://i.ibb.co/4PMD5W2/Screenshot-2022-09-20-181139.png)
+![alt text](https://i.ibb.co/4PMD5W2/Screenshot-2022-09-20-181139.png)
 ![alt text](https://i.ibb.co/nMXtv1C/Screenshot-2022-09-20-181209.png)
 ![alt text](https://i.ibb.co/Wy2MfDW/ChatApp.png)
 ![alt text](https://i.ibb.co/6HSF4ZQ/Screenshot-2022-09-20-022354.png)
