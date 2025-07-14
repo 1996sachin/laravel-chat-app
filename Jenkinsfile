@@ -43,6 +43,8 @@ pipeline {
                 sh '''
                 sudo chown -R www-data:www-data .
                 sudo chmod -R 755 .
+sh 'chmod -R 775 storage bootstrap/cache'
+        sh 'chown -R www-data:www-data storage bootstrap/cache'
                 '''
             }
         }
@@ -66,7 +68,7 @@ pipeline {
 
         stage('Restart Services') {
             steps {
-                sh 'sudo systemctl restart php8.1-fpm nginx'
+                sh 'sudo systemctl restart php8.3-fpm nginx'
             }
         }
     }
