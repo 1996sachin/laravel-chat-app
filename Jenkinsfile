@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Fix Workspace Permissions') {
             steps {
-                // Ensure Jenkins can overwrite files before checkout
+                // Ensure Jenkins can overwrite files before
                 sh 'sudo chown -R $USER:$USER $PWD || true'
                 sh 'sudo chmod -R u+rwX $PWD || true'
             }
@@ -48,11 +48,18 @@ pipeline {
 
         stage('Set Permissions') {
             steps {
-                sh '''
-                docker run --rm -v $PWD:$APP_DIR -w $APP_DIR laravel-chat-app bash -c "
-                    chown -R www-data:www-data storage bootstrap/cache
-                "
-                '''
+                // Ensure Jenkins can overwrite files before checkout
+                sh 'sudo chown -R $USER:$USER $PWD || true'
+                sh 'sudo chmod -R u+rwX $PWD || true'
+            }
+        }
+
+        stage('Start Services') {
+            steps {
+                // Start MySQL and Redis containers in detached mode
+                sh 'docker compose up -d db redis'
+                // Wait for MySQL to be ready (simple wait, adjust as needed)
+                sh 'docker compose exec db bash -c "until mysqladmin ping -h db --silent; do sleep 1; done"'
             }
         }
 
@@ -81,4 +88,3 @@ pipeline {
             echo '❌ Build failed. Check the logs.'
         }
     }
-}
