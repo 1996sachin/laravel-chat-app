@@ -22,6 +22,19 @@ pipeline {
             }
         }
 
+        stage('Prepare .env') {
+            steps {
+                sh '''
+                if [ ! -f .env ]; then
+                  cp .env.example .env
+                fi
+                sed -i 's/DB_DATABASE=.*/DB_DATABASE=chatapp/' .env
+                sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=Bipinsingh1/' .env
+                sed -i 's/DB_HOST=.*/DB_HOST=db/' .env
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -61,6 +74,7 @@ pipeline {
                 sh 'docker rm -f mysql || true'
             }
         }
+
         stage('Start Services') {
             steps {
                 // Start MySQL and Redis containers in detached mode
@@ -95,4 +109,3 @@ pipeline {
             echo '❌ Build failed. Check the logs.'
         }
     }
-}
