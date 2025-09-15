@@ -6,6 +6,14 @@ pipeline {
     }
 
     stages {
+        stage('Fix Workspace Permissions') {
+            steps {
+                // Ensure Jenkins can overwrite files before checkout
+                sh 'sudo chown -R $USER:$USER $PWD || true'
+                sh 'sudo chmod -R u+rwX $PWD || true'
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
