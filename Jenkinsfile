@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_DIR = "/var/www/laravel-chat-app"
+        APP_DIR = "/var/www/html"
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/1996sachin/laravel-chat-app.git',
@@ -14,80 +14,63 @@ pipeline {
             }
         }
 
-        stage('Install PHP Dependencies (Docker)') {
+        stage('Build Docker Image') {
             steps {
-                sh '''
-                docker run --rm -v $(pwd):/app -w /app php:8.1-cli bash -c "
-                  apt update &&
-                  apt install -y unzip git zip &&
-                  curl -sS https://getcomposer.org/installer | php &&
-                  php composer.phar install --no-interaction --prefer-dist --optimize-autoloader
-                "
-                '''
+                script {
+                    // Build the Docker image with PHP + Node
+                    sh 'docker build -t laravel-chat-app .'
+                }
             }
         }
 
-        stage('Install Node Dependencies') {
+        stage('Run Composer & Node') {
             steps {
-                sh '''
-                docker run --rm -v $(pwd):/app -w /app node:18 bash -c "
-                npm install
-               "
-          '''
-            }
-        }
-
-        stage('Build Assets') {
-            steps {
-                 sh '''
-                 docker run --rm -v $(pwd):/app -w /app node:18 bash -c "
-                 npm run build
-              "
-   '''
+                script {
+                    // Run container to install dependencies and build assets
+                    sh '''
+                    docker run --rm -v $PWD:$APP_DIR -w $APP_DIR laravel-chat-app bash -c "
+                        composer install --no-interaction --prefer-dist --optimize-autoloader &&
+                        npm install &&
+                        npm run build
+                    "
+                    '''
+                }
             }
         }
 
         stage('Set Permissions') {
             steps {
                 sh '''
-                sudo chown -R www-data:www-data .
-                sudo chmod -R 755 .
-                chmod -R 775 storage bootstrap/cache
-                chown -R www-data:www-data storage bootstrap/cache
+                docker run --rm -v $PWD:$APP_DIR -w $APP_DIR laravel-chat-app bash -c "
+                    chown -R www-data:www-data storage bootstrap/cache
+                "
                 '''
             }
         }
 
         stage('Run Migrations') {
             steps {
-                sh 'php artisan migrate --force'
-            }
-        }
-
-        stage('Clear and Cache Configs') {
-            steps {
                 sh '''
-                php artisan config:clear
-                php artisan config:cache
-                php artisan route:cache
-                php artisan view:cache
+                docker run --rm -v $PWD:$APP_DIR -w $APP_DIR laravel-chat-app bash -c "
+                    php artisan migrate --force
+                "
                 '''
             }
         }
 
         stage('Restart Services') {
             steps {
-                sh 'sudo systemctl restart php8.3-fpm nginx'
+                echo "Service restart logic here (depends on your environment)"
             }
         }
     }
 
     post {
-        failure {
-            echo '❌ Build failed. Please check the logs.'
-        }
         success {
-            echo '✅ Deployment successful!'
+            echo '✅ Build and deploy succeeded!'
+        }
+        failure {
+            echo '❌ Build failed. Check the logs.'
         }
     }
 }
