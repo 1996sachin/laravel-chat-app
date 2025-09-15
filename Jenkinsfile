@@ -29,13 +29,21 @@ pipeline {
 
         stage('Install Node Dependencies') {
             steps {
-                sh 'npm install'
+                sh '''
+                docker run --rm -v $(pwd):/app -w /app node:18 bash -c "
+                npm install
+               "
+          '''
             }
         }
 
         stage('Build Assets') {
             steps {
-                sh 'npm run prod'
+                 sh '''
+                 docker run --rm -v $(pwd):/app -w /app node:18 bash -c "
+                 npm run build
+              "
+   '''
             }
         }
 
