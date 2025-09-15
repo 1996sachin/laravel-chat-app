@@ -18,10 +18,11 @@ pipeline {
             steps {
                 sh '''
                 docker run --rm -v $(pwd):/app -w /app php:8.1-cli bash -c "
-                apt update &&
-                apt install -y unzip git zip &&
-                curl -sS https://getcomposer.org/installer | php &&
-                php composer.phar install --no-interaction --prefer-dist --optimize-autoloader"
+                  apt update &&
+                  apt install -y unzip git zip &&
+                  curl -sS https://getcomposer.org/installer | php &&
+                  php composer.phar install --no-interaction --prefer-dist --optimize-autoloader
+                "
                 '''
             }
         }
@@ -43,8 +44,8 @@ pipeline {
                 sh '''
                 sudo chown -R www-data:www-data .
                 sudo chmod -R 755 .
-sh 'chmod -R 775 storage bootstrap/cache'
-        sh 'chown -R www-data:www-data storage bootstrap/cache'
+                chmod -R 775 storage bootstrap/cache
+                chown -R www-data:www-data storage bootstrap/cache
                 '''
             }
         }
