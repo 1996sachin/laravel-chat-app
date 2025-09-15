@@ -54,6 +54,13 @@ pipeline {
             }
         }
 
+        stage('Cleanup Docker Containers') {
+            steps {
+                 // Remove any existing containers with conflicting names
+                sh 'docker rm -f redis || true'
+                sh 'docker rm -f mysql || true'
+            }
+        }
         stage('Start Services') {
             steps {
                 // Start MySQL and Redis containers in detached mode
