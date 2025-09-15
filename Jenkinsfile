@@ -88,3 +88,4 @@ pipeline {
             echo '❌ Build failed. Check the logs.'
         }
     }
+}
