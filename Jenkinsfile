@@ -8,9 +8,11 @@ pipeline {
     stages {
         stage('Fix Workspace Permissions') {
             steps {
+                sh '''
                 // Ensure Jenkins can overwrite files before
-                sh 'sudo chown -R $USER:$USER $PWD || true'
-                sh 'sudo chmod -R u+rwX $PWD || true'
+                chown -R jenkins:jenkins /var/lib/jenkins/workspace/laravel_chat-app || true
+                chmod -R u+rwX /var/lib/jenkins/workspace/laravel_chat-app || true
+                '''
             }
         }
 
